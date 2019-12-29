@@ -110,7 +110,7 @@ public class CoolWeatherDB {
     /**
      * set county infos to db
      */
-    public void savaCounty(County county){
+    public void saveCounty(County county){
         if(county!=null){
             ContentValues values = new ContentValues();
             values.put("county_name",county.getCountyName());
