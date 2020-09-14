@@ -104,6 +104,7 @@ public class ChooseAreaActivity extends Activity {
                 }
             }
         });
+        coolWeatherDB = CoolWeatherDB.getInstance(this);
         queryProvinces();
     }
     /**
@@ -215,7 +216,7 @@ public class ChooseAreaActivity extends Activity {
     }
 
     private void showProgressDialog(){
-        if(progressDialog != null){
+        if(progressDialog == null){
             progressDialog = new ProgressDialog(this);
             progressDialog.setMessage("loading ...");
             progressDialog.setCanceledOnTouchOutside(false);

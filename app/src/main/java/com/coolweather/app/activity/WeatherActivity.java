@@ -55,6 +55,7 @@ public class WeatherActivity extends Activity implements View.OnClickListener {
             publishText.setText("synchronizing");
             weatherInfoLayout.setVisibility(View.INVISIBLE);
             cityNameText.setVisibility(View.INVISIBLE);
+            cityNameText.setText(countyCode);
             queryWeatherCode(countyCode);
         }else{
             //no countycode
