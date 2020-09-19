@@ -6,6 +6,7 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.widget.Button;
@@ -18,6 +19,7 @@ import com.coolweather.app.R;
 import com.coolweather.app.service.AutoUpdateService;
 import com.coolweather.app.util.HttpCallbackListener;
 import com.coolweather.app.util.HttpUtil;
+import com.coolweather.app.util.LogUtils;
 import com.coolweather.app.util.Utility;
 
 import org.w3c.dom.Text;
@@ -50,6 +52,7 @@ public class WeatherActivity extends Activity implements View.OnClickListener {
         switchCity.setOnClickListener(this);
         refreshWeather.setOnClickListener(this);
         String countyCode = getIntent().getStringExtra("county_code");
+        LogUtils.d("weather-countycode="+countyCode);
         if(!TextUtils.isEmpty(countyCode)){
             // if have county level, then query weather
             publishText.setText("synchronizing");
@@ -74,7 +77,8 @@ public class WeatherActivity extends Activity implements View.OnClickListener {
      * query weather of weatherCode
      */
     private void queryWeatherInfo(String weatherCode){
-        String address = "http://www.weather.com.cn/data/cityinfo"+weatherCode+".html";
+        LogUtils.d("queryWeatherInfo --weatherCode:"+weatherCode);
+        String address = "http://www.weather.com.cn/data/cityinfo/"+weatherCode+".html";
         queryFromServer(address, "weatherCode");
     }
 
@@ -82,9 +86,11 @@ public class WeatherActivity extends Activity implements View.OnClickListener {
      * query weaherCode or weatherInfo from server, according to address and type
      */
     private void queryFromServer(final String address, final String type){
+        LogUtils.d("queryFromServer--address:"+address+",type:"+type);
         HttpUtil.sendHttpRequest(address, new HttpCallbackListener() {
             @Override
             public void onFinish(String response) {
+                LogUtils.d("onFinish=response:"+response+",type:"+type);
                 if("countyCode".equals(type)){
                     if(!TextUtils.isEmpty(response)){
                         //parse weatherCode from response
@@ -149,6 +155,7 @@ public class WeatherActivity extends Activity implements View.OnClickListener {
                 publishText.setText("synchronizing ...");
                 SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
                 String weatherCode = prefs.getString("weather_code","");
+                LogUtils.d("weatherCode-"+weatherCode);
                 if(!TextUtils.isEmpty(weatherCode)){
                     queryWeatherInfo(weatherCode);
                 }

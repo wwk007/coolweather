@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.text.TextUtils;
+import android.util.Log;
 
 import com.coolweather.app.db.CoolWeatherDB;
 import com.coolweather.app.model.City;
@@ -66,6 +67,7 @@ public class Utility {
      * handle county data from service
      */
     public synchronized static boolean handleCountiedResponse(CoolWeatherDB coolWeatherDB, String response, int cityId){
+        LogUtils.d("handleCountiedResponse--response:"+response+",cityId:"+cityId);
         if(!TextUtils.isEmpty(response)){
             String[] allCountied = response.split(",");
             if(allCountied != null && allCountied.length > 0){
@@ -89,6 +91,7 @@ public class Utility {
      */
     public static void handleWeatherResponse(Context context, String response){
         try {
+            LogUtils.d("handleWeatherResponse --response:"+response);
             JSONObject jsonObject = new JSONObject(response);
             JSONObject weatherInfo = jsonObject.getJSONObject("weatherinfo");
             String cityName = weatherInfo.getString("city");
@@ -97,6 +100,8 @@ public class Utility {
             String temp2 = weatherInfo.getString("temp2");
             String weatherDesp = weatherInfo.getString("weather");
             String publishTime = weatherInfo.getString("ptime");
+
+            LogUtils.d("weatherInfo:"+weatherInfo);
             saveWeatherInfo(context, cityName, weatherCode, temp1, temp2, weatherDesp, publishTime);
         } catch (JSONException e) {
             e.printStackTrace();
@@ -108,6 +113,8 @@ public class Utility {
      */
     public static void saveWeatherInfo(Context context, String cityName, String weatherCode, String temp1, String temp2,
     String weatherDesp, String publishTime){
+        LogUtils.d("saveWeatherInfo=cityName:"+cityName+",weatherCode:"+weatherCode+",temp1:"+temp1+",temp2:"+temp2+",weatherDesp:"+
+                weatherDesp+",publishTime:"+publishTime);
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy年M月d日",Locale.CHINA);
         SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(context).edit();
         editor.putBoolean("city_selected",true);

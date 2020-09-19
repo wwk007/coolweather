@@ -7,6 +7,7 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.widget.AdapterView;
@@ -24,12 +25,14 @@ import com.coolweather.app.model.County;
 import com.coolweather.app.model.Province;
 import com.coolweather.app.util.HttpCallbackListener;
 import com.coolweather.app.util.HttpUtil;
+import com.coolweather.app.util.LogUtils;
 import com.coolweather.app.util.Utility;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class ChooseAreaActivity extends Activity {
+    private String TAG = "weikang";
     public static final int LEVEL_PROVINCE = 0;
     public static final int LEVEL_CITY = 1;
     public static final int LEVEL_COUNTY = 2;
@@ -72,8 +75,10 @@ public class ChooseAreaActivity extends Activity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         isFromWeatherActivity = getIntent().getBooleanExtra("from_weather_activity",false);
+        LogUtils.d("isFromWeatherActivity="+isFromWeatherActivity);
         //has select city and not from_weather_activity
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        LogUtils.d("city_selected="+prefs.getBoolean("city_selected",false));
         if(prefs.getBoolean("city_selected",false) && !isFromWeatherActivity){
             Intent intent = new Intent(this, WeatherActivity.class);
             startActivity(intent);
@@ -89,6 +94,7 @@ public class ChooseAreaActivity extends Activity {
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                LogUtils.d("currentLevel:"+currentLevel);
                 if(currentLevel == LEVEL_PROVINCE){
                     selectedProvince = provinceList.get(position);
                     queryCities();
@@ -98,6 +104,7 @@ public class ChooseAreaActivity extends Activity {
                 }else if(currentLevel == LEVEL_COUNTY){
                     String countyCode = countyList.get(position).getCountyCode();
                     Intent intent = new Intent(ChooseAreaActivity.this, WeatherActivity.class);
+                    LogUtils.d("countyCode--"+countyCode);
                     intent.putExtra("county_code",countyCode);
                     startActivity(intent);
                     finish();
@@ -111,6 +118,7 @@ public class ChooseAreaActivity extends Activity {
      * query all province info , first database , if null ,from service
      */
     private void queryProvinces(){
+        LogUtils.d("queryProvinces");
         provinceList = coolWeatherDB.loadProvinces();
         if(provinceList.size() > 0){
             dataList.clear();
@@ -148,6 +156,7 @@ public class ChooseAreaActivity extends Activity {
      */
     private void queryCounties(){
         countyList = coolWeatherDB.loadCounties(selectedCity.getId());
+        LogUtils.d("queryCounties--"+countyList.size());
         if(countyList.size() > 0){
             dataList.clear();
             for(County county : countyList){
@@ -158,6 +167,7 @@ public class ChooseAreaActivity extends Activity {
             titleText.setText(selectedCity.getCityName());
             currentLevel = LEVEL_COUNTY;
         }else{
+            LogUtils.d("citycode:"+selectedCity.getCityCode());
             queryFromServer(selectedCity.getCityCode(), "county");
         }
     }
@@ -165,6 +175,7 @@ public class ChooseAreaActivity extends Activity {
      * queryFromServer
      */
     private void queryFromServer(final String code, final  String type){
+        LogUtils.d("queryFromServer");
         String address;
         if(!TextUtils.isEmpty(code)){
             address = "http://www.weather.com.cn/data/list3/city"+code+".xml";
